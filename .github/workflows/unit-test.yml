@@ -1,0 +1,68 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Tests
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  
+  unit-test:
+    runs-on: ubuntu-latest
+  
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install Poetry
+      run: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+    - name: Export requirements.txt using Poetry
+      run: |
+        poetry export --without-hashes --dev -o requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Test with pytest
+      run: |
+        pip install pytest
+        pip install pytest-cov
+        pytest tests --verbose --doctest-modules -o junit_family=xunit2 --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+    - name: Upload pytest test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: pytest-results
+        path: junit/test-results.xml
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+    - name: Upload code coverage (xml)
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage
+        path: coverage.xml
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+    - name: Upload code coverage (html)
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage-html
+        path: htmlcov
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+    - name: 'Publish code coverage to Azure App Service'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: code-coverage-app
+        publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }} # Replace with the name of your publish profile
+        package: htmlcov
+      #if: ${{ always() }}
