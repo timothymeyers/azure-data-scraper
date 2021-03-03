@@ -22,7 +22,7 @@ jobs:
         uses: snok/install-poetry@v1.1.1
       - name: Timestamp project version
         run: |
-          version=`poetry version -s`-`date +"%Y%m%d%k%M%S"`
+          version=`poetry version -s`.`date +"%Y%m%d%k%M%S"`
           poetry version $version
       - name: Build a binary wheel and source tarball
         run: poetry build
