@@ -23,7 +23,9 @@ jobs:
       - name: Timestamp project version
         run: |
           version=`poetry version -s`-`date +"%Y%m%d%k%M%S"`
+          echo $version
           poetry version $version
+          poetry version
       - name: Build a binary wheel and source tarball
         run: poetry build
       - name: Publish distribution 📦 to Test PyPI
