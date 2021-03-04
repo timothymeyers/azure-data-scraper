@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "azure-data-scraper-pkg-test"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = ["Tim Meyers <timothy.m.meyers@gmail.com>"]
 readme = "README.md"
