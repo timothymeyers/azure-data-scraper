@@ -1,0 +1,24 @@
+name: 03 Publish to PyPi
+
+on:
+  release:
+    types: [published]
+  
+jobs: 
+  build-and-publish:
+    name: Build and publish to Test PyPi
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}   
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: snok/install-poetry@v1.1.1
+      - name: Build a binary wheel and source tarball
+        run: poetry build
+      - name: Publish distribution to Test PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+      
