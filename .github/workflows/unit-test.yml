@@ -56,10 +56,10 @@ jobs:
         path: htmlcov
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
-    #- name: 'Publish code coverage to Azure App Service'
-    #  uses: azure/webapps-deploy@v2
-    #  with:
-    #    app-name: code-coverage-app
-    #    publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }} # Replace with the name of your publish profile
-    #    package: htmlcov
+    - name: 'Publish code coverage to Azure App Service'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: code-coverage-app
+        publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }} # Replace with the name of your publish profile
+        package: htmlcov
     
