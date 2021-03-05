@@ -132,6 +132,5 @@ dmypy.json
 requirements.txt
 poetry.lock
 junit/*
-azure_data_scraper/data_joiner.py
-tests/test_DataJoiner.py
+.vscode/
 tests/test_azure_data_scraper.py
