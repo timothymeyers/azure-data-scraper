@@ -85,8 +85,22 @@ def test_getServiceDetailsDeep(dataj):
     assert type(cog['capabilities']['Personalizer']) is dict
 
 
-def test_getCategoryServiceList(dataj):
-    assert len(dataj.getCategoryServiceList('Compute')) > 0
-    assert len(dataj.getCategoryServiceList('SUPER LASERS')) == 0
-    assert len(dataj.getCategoryServiceList('')) == 0
-    assert len(dataj.getCategoryServiceList(None)) == 0
+@pytest.mark.parametrize("cat_id, expected_result", [
+    ('Compute', True),  
+    ('SUPER LASERS', False),  
+    ('', False),  
+    (None, False)
+])
+def test_getCategoryServiceList(dataj, cat_id, expected_result):
+    assert (len(dataj.getCategoryServiceList(cat_id)) > 0) == expected_result
+
+@pytest.mark.parametrize("cat_id, expected_result", [
+    ('Compute', True),  
+    ('SUPER LASERS', False),  
+    ('', False),  
+    (None, False)
+])
+def test_getCategoryServices(dataj, cat_id, expected_result):
+    c = dataj.getCategoryServices(cat_id)
+    assert (type(c) is dict) == True
+    assert (len(c.keys()) > 0) == expected_result

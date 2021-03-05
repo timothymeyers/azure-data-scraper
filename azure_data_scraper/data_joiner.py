@@ -90,7 +90,14 @@ class DataJoiner:
             return self.getProductDetails(prod_id)
         return {}
 
-    def getServiceDetailsDeep(self, prod_id) -> dict:
+    def getServiceDetailsDeep(self, prod_id) -> dict:        
+        svc = self.getServiceDetails(prod_id)
+        if 'capabilities' in svc:           
+            new_cap_dict = {cap: self.getProductDetails(cap) for cap in svc['capabilities']}
+            svc['capabilities'] = new_cap_dict
+        return svc
+
+        """
         if prod_id in self.__product_dict and self.__product_dict[prod_id]['type'] == "service":
             return_prod = self.__product_dict[prod_id].copy()
             new_cap_dict = {cap: self.getProductDetails(
@@ -98,6 +105,7 @@ class DataJoiner:
             return_prod['capabilities'] = new_cap_dict
             return return_prod
         return {}
+        """
 
     def getCategoryServiceList(self, cat_id) -> list:
         if cat_id in self.__category_dict:
@@ -106,7 +114,7 @@ class DataJoiner:
 
     def getCategoryServices(self, cat_id) -> dict:
         if cat_id in self.__category_dict:
-            return {svc: self.getProductDetails(svc) for svc in self.__category_dict[cat_id]}
+            return {svc: self.getServiceDetails(svc) for svc in self.__category_dict[cat_id]}
         return {}
 
     def getCategoryServicesDeep(self, cat_id) -> dict:
