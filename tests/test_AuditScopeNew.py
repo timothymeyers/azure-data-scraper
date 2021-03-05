@@ -1,5 +1,5 @@
 import pytest
-from azure_data_scraper.audit_scope_scraper import AuditScopes
+from azure_data_scraper.audit_scope_scraper import AuditScopes, camelize
 
 # "Constaints"
 
@@ -12,6 +12,7 @@ def asl():
 
 def test_isInitialized(asl):   
     assert (len(asl.getAuditScopeDictionary().keys())>0)
+    assert camelize('Hello Super 1 Man (World') == 'helloSuper1ManWorld'
 
 def test_isAtAuditScopeForCloud_noCloud(asl):
     assert asl.isAtAuditScopeInCloud('','','') == False
