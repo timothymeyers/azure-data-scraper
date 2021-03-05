@@ -3,3 +3,5 @@
 
 # azure-data-scraper
 tbd
+
+[Code Coverage](https://code-coverage-app.azurewebsites.net/)
