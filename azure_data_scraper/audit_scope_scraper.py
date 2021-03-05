@@ -112,10 +112,7 @@ class AuditScopes:
             return_dict[svc_name] = i
 
         return return_dict
-
-    def __dump_audit_scopes (self):
-        print (json.dumps(self.__audit_scope_dictionary))
-
+    
     def getAuditScopeDictionary(self) -> dict:
         return self.__audit_scope_dictionary
 
@@ -135,22 +132,19 @@ class AuditScopes:
         logging.debug('isAtAuditScopeForCloud - Checking [%s] at [%s] in [%s]',
                       svc, scope, cloud)
 
-        try:
-            if svc not in self.__audit_scope_dictionary.keys():
-                logging.info(
-                    'isAtAuditScopeForCloud - [' + svc + '] is not in the audit_scope_dicitonary')
-                return False
 
-            if scope in self.__audit_scope_dictionary[svc][cloud]['scopes']:
-                logging.info(
-                    'isAtAuditScopeForCloud - [%s] lists \'%s\' for %s', svc, scope, cloud)
-                return True
-
+        if svc not in self.__audit_scope_dictionary.keys():
             logging.info(
-                'isAtAuditScopeForCloud - [%s] does not list \'%s\' for %s', svc, scope, cloud)
+                'isAtAuditScopeForCloud - [' + svc + '] is not in the audit_scope_dicitonary')
+            return False
 
-        except KeyError as e:
-            logging.error (e)
-            pass
+        if scope in self.__audit_scope_dictionary[svc][cloud]['scopes']:
+            logging.info(
+                'isAtAuditScopeForCloud - [%s] lists \'%s\' for %s', svc, scope, cloud)
+            return True
+
+        logging.info(
+            'isAtAuditScopeForCloud - [%s] does not list \'%s\' for %s', svc, scope, cloud)
+
 
         return False
