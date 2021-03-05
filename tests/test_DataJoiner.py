@@ -40,19 +40,41 @@ def test_verifyDataJoined(dataj, service):
     assert len(prod['azure-government']['scopes']) > 0
 
 
-def test_getProductDetails_NotExist(dataj):
-    test = dataj.getProductDetails("")
-    assert type(test) is dict
-    assert test == {}
+@pytest.mark.parametrize("prod_id, expected_result", [
+    ('API Management', True),  # service
+    ('AI Builder', True),  # capability
+    ('', False),  # empty
+    (None, False)  # None
+])
+def test_getProductDetails(dataj, prod_id, expected_result):
+    prod = dataj.getProductDetails(prod_id)
+    assert type(prod) is dict
+    print ('keys', prod.keys()) 
+    assert (len(prod.keys()) > 0) == expected_result
 
-    test = dataj.getServiceDetails("")
-    assert type(test) is dict
-    assert test == {}
+@pytest.mark.parametrize("prod_id, expected_result", [
+    ('API Management', True),  # service
+    ('AI Builder', False),  # capability
+    ('', False),  # empty
+    (None, False)  # None
+])
+def test_getServiceDetails(dataj, prod_id, expected_result):
+    prod = dataj.getServiceDetails(prod_id)
+    assert type(prod) is dict
+    print ('keys', prod.keys()) 
+    assert (len(prod.keys()) > 0) == expected_result
 
-    test = dataj.getCapabilityDetails("")
-    assert type(test) is dict
-    assert test == {}
-
+@pytest.mark.parametrize("prod_id, expected_result", [
+    ('API Management', False),  # service
+    ('AI Builder', True),  # capability
+    ('', False),  # empty
+    (None, False)  # None
+])
+def test_getCapabilityDetails(dataj, prod_id, expected_result):
+    prod = dataj.getCapabilityDetails(prod_id)
+    assert type(prod) is dict
+    print ('keys', prod.keys()) 
+    assert (len(prod.keys()) > 0) == expected_result
 
 def test_getServiceDetailsDeep(dataj):
     cog = dataj.getServiceDetailsDeep("Azure Cognitive Services")
@@ -67,4 +89,4 @@ def test_getCategoryServiceList(dataj):
     assert len(dataj.getCategoryServiceList('Compute')) > 0
     assert len(dataj.getCategoryServiceList('SUPER LASERS')) == 0
     assert len(dataj.getCategoryServiceList('')) == 0
-    # assert len(dataj.getCategoryServiceList(None)) == 0
+    assert len(dataj.getCategoryServiceList(None)) == 0
