@@ -8,8 +8,8 @@ import logging
 
 class DataJoiner:
     def __init__(self, audit_scopes=AuditScopes(), products_by_region=ProductsByRegion()):
-        self.__audit_scopes = audit_scopes
-        self.__products_by_region = products_by_region
+        #self.__audit_scopes = audit_scopes
+        #self.__products_by_region = products_by_region
 
         self.__product_dict = self.__hydrate_product_dict(audit_scopes.getAuditScopeDictionary(
         ), products_by_region.getProductsAvailabilityDictionary())
@@ -57,20 +57,16 @@ class DataJoiner:
     def products(self) -> dict:
         return self.__product_dict
 
-    def product_list(self) -> list:
-        return self.products().keys()
 
-    def audit_scopes(self) -> AuditScopes:
-        return self.__audit_scopes
+#    def audit_scopes(self) -> AuditScopes:
+#        return self.__audit_scopes
 
-    def product_availability(self) -> ProductsByRegion:
-        return self.__products_by_region
+#    def product_availability(self) -> ProductsByRegion:
+#        return self.__products_by_region
 
     def categories(self) -> dict:
         return self.__category_dict
 
-    def category_list(self) -> list:
-        return self.categories().keys()
 
     def getCategoryDictionary(self) -> dict:
         return self.__category_dict
@@ -121,3 +117,74 @@ class DataJoiner:
         if cat_id in self.__category_dict:
             return {svc: self.getServiceDetailsDeep(svc) for svc in self.__category_dict[cat_id]}
         return {}
+
+    #### Get Summary Data
+
+    def categories_list(self) -> list:
+        return self.categories().keys()
+
+    def products_list(self) -> list:
+        return self.products().keys()
+
+    def services_list(self) -> list:
+        return [id for id, prod in self.__product_dict.items() if prod['type'] == 'service']
+
+    def capabilities_list(self) -> list:
+        return [id for id, prod in self.__product_dict.items() if prod['type'] == 'capability']
+
+
+    #### Question and Answer
+    def isProductAvailable(self, prod, cloud="") -> bool:
+
+        if prod in self.__product_dict:
+            az_pub = self.__product_dict[prod]['azure-public']['available']
+            az_gov = self.__product_dict[prod]['azure-government']['available']
+        
+            if (cloud == 'azure-public'): return az_pub
+            if (cloud == 'azure-government'): return az_gov
+
+            return (az_pub or az_gov)
+
+        return False
+
+    def isProductAvailableInRegion(self, prod, region) -> bool:
+        az_pub = region in self.getProductAvailableRegions(prod,'azure-public')
+        az_gov = region in self.getProductAvailableRegions(prod,'azure-government')
+
+        return (az_pub or az_gov)
+
+    def isServiceAvailable(self, svc, cloud="") -> bool:
+        return self.isProductAvailable(svc,cloud)
+
+    def isServiceAvailableInRegion(self, svc, region) -> bool:
+        return self.isProductAvailableInRegion(svc,region)
+
+    def isCapabilityAvailable(self, cap, cloud="") -> bool:
+        return self.isProductAvailable(cap,cloud)
+    
+    def isCapabilityAvailableInRegion(self, cap, region) -> bool:
+        return self.isProductAvailableInRegion(cap,region)
+
+    def getProductAvailableRegions(self, prod, cloud="") -> list:
+        return self.__helper_get_product_cloud_lists(prod, cloud, 'ga')
+
+    def getProductPreviewRegions(self, prod, cloud="") -> list:
+        return self.__helper_get_product_cloud_lists(prod, cloud, 'preview')
+
+    def getProductRegionsGATargets(self, prod, cloud="") -> list:
+        return self.__helper_get_product_cloud_lists(prod, cloud, 'planned-active')
+
+    def getProductScopes(self, prod, cloud="") -> list:
+        return self.__helper_get_product_cloud_lists(prod, cloud, 'scopes')
+
+    def __helper_get_product_cloud_lists(self, prod, cloud, which_list):
+
+        if prod in self.__product_dict:
+            az_pub_regions = self.__product_dict[prod]['azure-public'][which_list]
+            az_gov_regions = self.__product_dict[prod]['azure-government'][which_list]
+
+            if (cloud == 'azure-public'): return az_pub_regions
+            if (cloud == 'azure-government'): return az_gov_regions
+            return az_pub_regions + az_gov_regions
+
+        return []
