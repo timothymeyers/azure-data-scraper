@@ -17,7 +17,7 @@ def dataj():
 
 def test_isInitialized(dataj):
     assert len(dataj.products_list()) > 0
-    assert len(dataj.categorys_list()) > 0
+    assert len(dataj.categories_list()) > 0
     assert len(dataj.services_list()) > 0
     assert len(dataj.capabilities_list()) > 0
     assert len(dataj.getJoinedData().keys()) > 0
