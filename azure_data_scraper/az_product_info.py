@@ -6,7 +6,7 @@ import json
 import logging
 
 
-class DataJoiner:
+class AzProductInfo:
     def __init__(self, audit_scopes=AuditScopes(), products_by_region=ProductsByRegion()):
         #self.__audit_scopes = audit_scopes
         #self.__products_by_region = products_by_region
@@ -55,7 +55,7 @@ class DataJoiner:
         return self.products()
 
     def products(self) -> dict:
-        return self.__product_dict
+        return self.__product_dict.copy()
 
 
 #    def audit_scopes(self) -> AuditScopes:
@@ -65,11 +65,11 @@ class DataJoiner:
 #        return self.__products_by_region
 
     def categories(self) -> dict:
-        return self.__category_dict
+        return self.__category_dict.copy()
 
 
     def getCategoryDictionary(self) -> dict:
-        return self.__category_dict
+        return self.__category_dict.copy()
 
     def getProductDetails(self, prod_id) -> dict:
         if prod_id in self.__product_dict:
@@ -150,6 +150,15 @@ class DataJoiner:
     def isProductAvailableInRegion(self, prod, region) -> bool:
         az_pub = region in self.getProductAvailableRegions(prod,'azure-public')
         az_gov = region in self.getProductAvailableRegions(prod,'azure-government')
+
+        return (az_pub or az_gov)
+
+    def isAtAuditScope(self,prod, scope, cloud="") -> bool:
+        az_pub = scope in self.getProductScopes(prod,'azure-public')
+        az_gov = scope in self.getProductScopes(prod,'azure-government')
+
+        if (cloud == 'azure-public'): return az_pub
+        if (cloud == 'azure-government'): return az_gov
 
         return (az_pub or az_gov)
 

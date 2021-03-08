@@ -116,6 +116,7 @@ class AuditScopes:
     def getAuditScopeDictionary(self) -> dict:
         return self.__audit_scope_dictionary
 
+    """
     def isAtAuditScope(self, svc, scope) -> bool:
         logging.debug('isAtAuditScope - Checking [' + svc + '] at [' + scope + ']')
 
@@ -148,3 +149,5 @@ class AuditScopes:
 
 
         return False
+
+    """

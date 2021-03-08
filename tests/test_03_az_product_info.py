@@ -1,5 +1,5 @@
 import pytest
-from azure_data_scraper.data_joiner import DataJoiner
+from azure_data_scraper.az_product_info import AzProductInfo
 #from azure_data_scraper.audit_scope_scraper import AuditScopes
 #from azure_data_scraper.product_by_region_scraper import ProductsByRegion
 
@@ -9,32 +9,32 @@ from azure_data_scraper.data_joiner import DataJoiner
 
 
 @pytest.fixture(scope="session")
-def dataj():
-    return DataJoiner()
+def az():
+    return AzProductInfo()
 
 # Tests
 
 
-def test_isInitialized(dataj):
-    assert len(dataj.products_list()) > 0
-    assert len(dataj.categories_list()) > 0
-    assert len(dataj.services_list()) > 0
-    assert len(dataj.capabilities_list()) > 0
-    assert len(dataj.getJoinedData().keys()) > 0
-    assert len(dataj.getProductDictionary().keys()) > 0
+def test_isInitialized(az):
+    assert len(az.products_list()) > 0
+    assert len(az.categories_list()) > 0
+    assert len(az.services_list()) > 0
+    assert len(az.capabilities_list()) > 0
+    assert len(az.getJoinedData().keys()) > 0
+    assert len(az.getProductDictionary().keys()) > 0
 
-    assert len(dataj.getCategoryDictionary().keys()) > 0
+    assert len(az.getCategoryDictionary().keys()) > 0
 
-    #assert type(dataj.audit_scopes()) is AuditScopes
-    #assert type(dataj.product_availability()) is ProductsByRegion
+    #assert type(az.audit_scopes()) is AuditScopes
+    #assert type(az.product_availability()) is ProductsByRegion
 
 
 @pytest.mark.parametrize("service", [
     ("API Management"),
     ("Application Gateway")
 ])
-def test_verifyDataJoined(dataj, service):
-    prod = dataj.getProductDetails(service)
+def test_verifyazoined(az, service):
+    prod = az.getProductDetails(service)
 
     assert len(prod['azure-public']['ga']) > 0
     assert len(prod['azure-public']['scopes']) > 0
@@ -48,11 +48,12 @@ def test_verifyDataJoined(dataj, service):
     ('', False),  # empty
     (None, False)  # None
 ])
-def test_getProductDetails(dataj, prod_id, expected_result):
-    prod = dataj.getProductDetails(prod_id)
+def test_getProductDetails(az, prod_id, expected_result):
+    prod = az.getProductDetails(prod_id)
     assert type(prod) is dict
-    print ('keys', prod.keys()) 
+    print('keys', prod.keys())
     assert (len(prod.keys()) > 0) == expected_result
+
 
 @pytest.mark.parametrize("prod_id, expected_result", [
     ('API Management', True),  # service
@@ -60,11 +61,12 @@ def test_getProductDetails(dataj, prod_id, expected_result):
     ('', False),  # empty
     (None, False)  # None
 ])
-def test_getServiceDetails(dataj, prod_id, expected_result):
-    prod = dataj.getServiceDetails(prod_id)
+def test_getServiceDetails(az, prod_id, expected_result):
+    prod = az.getServiceDetails(prod_id)
     assert type(prod) is dict
-    print ('keys', prod.keys()) 
+    print('keys', prod.keys())
     assert (len(prod.keys()) > 0) == expected_result
+
 
 @pytest.mark.parametrize("prod_id, expected_result", [
     ('API Management', False),  # service
@@ -72,14 +74,15 @@ def test_getServiceDetails(dataj, prod_id, expected_result):
     ('', False),  # empty
     (None, False)  # None
 ])
-def test_getCapabilityDetails(dataj, prod_id, expected_result):
-    prod = dataj.getCapabilityDetails(prod_id)
+def test_getCapabilityDetails(az, prod_id, expected_result):
+    prod = az.getCapabilityDetails(prod_id)
     assert type(prod) is dict
-    print ('keys', prod.keys()) 
+    print('keys', prod.keys())
     assert (len(prod.keys()) > 0) == expected_result
 
-def test_getServiceDetailsDeep(dataj):
-    cog = dataj.getServiceDetailsDeep("Azure Cognitive Services")
+
+def test_getServiceDetailsDeep(az):
+    cog = az.getServiceDetailsDeep("Azure Cognitive Services")
 
     assert cog['prod-id'] == "Azure Cognitive Services"
     assert type(cog['capabilities']) is dict
@@ -88,31 +91,28 @@ def test_getServiceDetailsDeep(dataj):
 
 
 @pytest.mark.parametrize("cat_id, expected_result", [
-    ('Compute', True),  
-    ('SUPER LASERS', False),  
-    ('', False),  
+    ('Compute', True),
+    ('SUPER LASERS', False),
+    ('', False),
     (None, False)
 ])
-def test_getCategoryServiceList(dataj, cat_id, expected_result):
-    assert (len(dataj.getCategoryServiceList(cat_id)) > 0) == expected_result
+def test_getCategoryServiceList(az, cat_id, expected_result):
+    assert (len(az.getCategoryServiceList(cat_id)) > 0) == expected_result
+
 
 @pytest.mark.parametrize("cat_id, expected_result", [
-    ('Compute', True),  
-    ('SUPER LASERS', False),  
-    ('', False),  
+    ('Compute', True),
+    ('SUPER LASERS', False),
+    ('', False),
     (None, False)
 ])
-def test_getCategoryServices(dataj, cat_id, expected_result):
-    c = dataj.getCategoryServices(cat_id)
+def test_getCategoryServices(az, cat_id, expected_result):
+    c = az.getCategoryServices(cat_id)
     assert (type(c) is dict) == True
     assert (len(c.keys()) > 0) == expected_result
 
 
-
-
-
-### New from PbR
-
+# New from PbR
 
 
 @pytest.mark.parametrize("service, cloud, expected_result", [
@@ -121,8 +121,8 @@ def test_getCategoryServices(dataj, cat_id, expected_result):
     ('Azure Blueprints', "azure-government", False),
     ('Windows Virtual Desktop', "azure-government", False)
 ])
-def test_isServiceAvailable(dataj, service, cloud, expected_result):
-    assert dataj.isServiceAvailable(service, cloud) == expected_result
+def test_isServiceAvailable(az, service, cloud, expected_result):
+    assert az.isServiceAvailable(service, cloud) == expected_result
 
 
 @pytest.mark.parametrize("capability, cloud, expected_result", [
@@ -130,8 +130,8 @@ def test_isServiceAvailable(dataj, service, cloud, expected_result):
     ("Hb-series", "azure-government", False),
     ("Hc-series", "azure-government", False)
 ])
-def test_isCapabilityAvailable(dataj, capability, cloud, expected_result):
-    assert dataj.isCapabilityAvailable(
+def test_isCapabilityAvailable(az, capability, cloud, expected_result):
+    assert az.isCapabilityAvailable(
         capability, cloud) == expected_result
 
 
@@ -150,8 +150,9 @@ def test_isCapabilityAvailable(dataj, capability, cloud, expected_result):
     ("Hc-series", False)
 
 ])
-def test_isProductAvailableAzureGovernment(dataj, product, expected_result):
-    assert dataj.isProductAvailable(product, "azure-government") == expected_result
+def test_isProductAvailableAzureGovernment(az, product, expected_result):
+    assert az.isProductAvailable(
+        product, "azure-government") == expected_result
 
 
 @pytest.mark.parametrize("prod, region, expected_result", [
@@ -197,8 +198,9 @@ def test_isProductAvailableAzureGovernment(dataj, product, expected_result):
     ('Video Indexer', 'usgov-arizona', True),
     ('Video Indexer', 'usgov-texas', False)
 ])
-def test_isProductAvailableInRegion(dataj, prod, region, expected_result):
-    assert dataj.isProductAvailableInRegion(prod, region) == expected_result
+def test_isProductAvailableInRegion(az, prod, region, expected_result):
+    assert az.isProductAvailableInRegion(prod, region) == expected_result
+
 
 @pytest.mark.parametrize("product, cloud", [
     ('Windows Virtual Desktop', 'azure-government'),
@@ -206,8 +208,9 @@ def test_isProductAvailableInRegion(dataj, prod, region, expected_result):
     #    ('Anomoly Detector', 'usgov-virginia'),
     #    ('Microsoft Genomics', False),
 ])
-def test_isProductInPreview(dataj, product, cloud):
-    assert len(dataj.getProductPreviewRegions(product, cloud)) > 0
+def test_isProductInPreview(az, product, cloud):
+    assert len(az.getProductPreviewRegions(product, cloud)) > 0
+
 
 @pytest.mark.parametrize("product, expected_result", [
     ('Windows Virtual Desktop', 'usgov-non-regional'),
@@ -215,8 +218,8 @@ def test_isProductInPreview(dataj, product, cloud):
     #    ('Anomoly Detector', 'usgov-virginia'),
     #    ('Microsoft Genomics', False),
 ])
-def test_isProductInPreviewInRegion(dataj, product, expected_result):
-    assert expected_result in dataj.getProductPreviewRegions(product)
+def test_isProductInPreviewInRegion(az, product, expected_result):
+    assert expected_result in az.getProductPreviewRegions(product)
     #assert True
     # previewList = availList.isProductInPreview(product)
 
@@ -224,3 +227,48 @@ def test_isProductInPreviewInRegion(dataj, product, expected_result):
     #     assert expected_result in previewList.keys()
     # else :
     #     assert previewList == False
+
+
+@pytest.mark.parametrize("product, scope, cloud, expected_result", [
+    ('','','', False),
+    ('', 'DoD CC SRG IL 2', 'azure-public', False),
+    ('', 'FedRAMP Moderate', 'azure-public', False),
+    ('', 'FedRAMP High', 'azure-public', False),
+    ('', 'Planned 2021', 'azure-public', False),
+
+    ('API Management', 'DoD CC SRG IL 2', '', True),
+    ('API Management', 'FedRAMP Moderate', 'c', True),
+    ('API Management', 'FedRAMP High', None, True),
+    ('API Management', 'Planned 2021', None, False),
+
+    ('API Management', 'DoD CC SRG IL 2', 'azure-public', True),
+    ('API Management', 'FedRAMP Moderate', 'azure-public', True),
+    ('API Management', 'FedRAMP High', 'azure-public', True),
+    ('API Management', 'Planned 2021', 'azure-public', False),
+
+    ('Azure Data Lake Storage', 'Planned 2021', 'azure-public',  True),
+
+    ('Azure Data Box', 'FedRAMP High', 'azure-public', True),
+
+    ('', 'DoD CC SRG IL 2', 'azure-government', False),
+    ('', 'DoD CC SRG IL 4', 'azure-government', False),
+    ('', 'DoD CC SRG IL 5', 'azure-government', False),
+    ('', 'FedRAMP High', 'azure-government', False),
+    ('', 'DoD CC SRG IL 6', 'azure-government', False),
+
+    ('Application Gateway', 'DoD CC SRG IL 2', 'azure-government', True),
+    ('Application Gateway', 'DoD CC SRG IL 4', 'azure-government', True),
+    ('Application Gateway', 'DoD CC SRG IL 5 (Azure Gov)', 'azure-government', True),
+    ('Application Gateway', 'DoD CC SRG IL 5 (Azure DoD)', 'azure-government', True),
+    ('Application Gateway', 'FedRAMP High', 'azure-government', True),
+    ('Application Gateway', 'DoD CC SRG IL 6', 'azure-government', True),
+
+    ('Azure Stream Analytics', 'DoD CC SRG IL 2', 'azure-government', True),
+    ('Azure Stream Analytics', 'DoD CC SRG IL 4', 'azure-government', True),
+    ('Azure Stream Analytics', 'DoD CC SRG IL 5 **', 'azure-government', False),
+    ('Azure Stream Analytics', 'FedRAMP High', 'azure-government', True),
+    ('Azure Stream Analytics', 'DoD CC SRG IL 6', 'azure-government', False),
+
+])
+def test_isAtAuditScope(az, product, scope, cloud, expected_result):
+    az.isAtAuditScope(product, scope, cloud) == expected_result

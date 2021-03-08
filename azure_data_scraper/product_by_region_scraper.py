@@ -217,64 +217,8 @@ class ProductsByRegion:
 
             self.__products_dictionary[prodId][cloud]['planned-active'].append(active)
 
-    def getProductsAvailabilityDictionary(self) -> dict:
-        return self.__products_dictionary
-
-    def getServicesList(self) -> list:
-        return [id for id, prod in self.__products_dictionary.items() if prod['type'] == 'service']
-
-    def getCapabilitiesList(self) -> list:
-        return [id for id, prod in self.__products_dictionary.items() if prod['type'] == 'capability']
-
-    def isProductAvailable(self, prod, cloud="") -> bool:
-
-        if prod in self.__products_dictionary:
-            az_pub = self.__products_dictionary[prod]['azure-public']['available']
-            az_gov = self.__products_dictionary[prod]['azure-government']['available']
-        
-            if (cloud == 'azure-public'): return az_pub
-            if (cloud == 'azure-government'): return az_gov
-
-            return (az_pub or az_gov)
-
-        return False
-
-    def isProductAvailableInRegion(self, prod, region) -> bool:
-
-        if prod in self.__products_dictionary:
-            az_pub = region in self.__products_dictionary[prod]['azure-public']['ga']
-            az_gov = region in self.__products_dictionary[prod]['azure-government']['ga']
-
-            return (az_pub or az_gov)
-
-        return False
-
-    def isServiceAvailable(self, svc, cloud="") -> bool:
-        return self.isProductAvailable(svc,cloud)
-
-    def isServiceAvailableInRegion(self, svc, region) -> bool:
-        return self.isProductAvailableInRegion(svc,region)
-
-    def isCapabilityAvailable(self, cap, cloud="") -> bool:
-        return self.isProductAvailable(cap,cloud)
+    def products(self) -> dict:
+        return self.__products_dictionary.copy()
     
-    def isCapabilityAvailableInRegion(self, cap, region) -> bool:
-        return self.isProductAvailableInRegion(cap,region)
-
-    def getProductPreviewRegions(self, prod, cloud="") -> list:
-        return self.__helper_get_product_cloud_lists(prod, cloud, 'preview')
-
-    def getProductRegionsGATargets(self, prod, cloud="") -> list:
-        return self.__helper_get_product_cloud_lists(prod, cloud, 'planned-active')
-
-    def __helper_get_product_cloud_lists(self, prod, cloud, which_list):
-
-        if prod in self.__products_dictionary:
-            az_pub_regions = self.__products_dictionary[prod]['azure-public'][which_list]
-            az_gov_regions = self.__products_dictionary[prod]['azure-government'][which_list]
-
-            if (cloud == 'azure-public'): return az_pub_regions
-            if (cloud == 'azure-government'): return az_gov_regions
-            return az_pub_regions + az_gov_regions
-
-        return []
+    def getProductsAvailabilityDictionary(self) -> dict:
+        return self.__products_dictionary.copy()
