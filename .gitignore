@@ -131,7 +131,7 @@ dmypy.json
 # Project specific ignores
 requirements.txt
 poetry.lock
-junit/*
+junit
 .vscode/
 tests/test_azure_data_scraper.py
 *.json
