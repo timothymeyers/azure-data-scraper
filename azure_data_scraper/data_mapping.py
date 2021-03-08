@@ -38,6 +38,7 @@ service_map = {
     'Time Series Insights': 'Azure Time Series Insights',
     'Azure Intune': 'Intune',
     'Azure Machine Learning studio': 'Machine Learning Studio',
+    'Load Balancing':'Load Balancer',
     'Virtual Machines (incl. Reserved Instances)': 'Virtual Machines',
     'Azure DB for MySQL': 'Azure Database for MySQL',
     'Azure DB for PostgreSQL': 'Azure Database for PostgreSQL',
