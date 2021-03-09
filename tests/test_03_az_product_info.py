@@ -45,7 +45,7 @@ def test_isInitialized(az):
     ("API Management"),
     ("Application Gateway")
 ])
-def test_verifyazoined(az, service):
+def test_verifyJoined(az, service):
     prod = az.getProductDetails(service)
 
     assert len(prod['azure-public']['ga']) > 0
