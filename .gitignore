@@ -134,5 +134,4 @@ poetry.lock
 junit
 .vscode/
 tests/test_azure_data_scraper.py
-*.json
 run.py
