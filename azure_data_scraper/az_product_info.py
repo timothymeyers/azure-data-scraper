@@ -7,12 +7,14 @@ import logging
 
 
 class AzProductInfo:
-    def __init__(self, audit_scopes=AuditScopes(), products_by_region=ProductsByRegion()):
+    def __init__(self, audit_scopes=AuditScopes(), products_by_region=ProductsByRegion(), src="web"):
         #self.__audit_scopes = audit_scopes
         #self.__products_by_region = products_by_region
 
-        self.__product_dict = self.__hydrate_product_dict(audit_scopes.getAuditScopeDictionary(
-        ), products_by_region.getProductsAvailabilityDictionary())
+        if src == "web":
+            self.__product_dict = self.__hydrate_product_dict(audit_scopes.getAuditScopeDictionary(), products_by_region.getProductsAvailabilityDictionary())
+        else:
+            self.__product_dict = self.__hydrate_product_dict_from_file(src)
         self.__category_dict = self.__hydrate_category_dict()
 
     def __hydrate_product_dict(self, audit_scopes, products_by_region) -> dict:
@@ -28,6 +30,10 @@ class AzProductInfo:
             prod.pop('doc-type')
 
         return product_dict
+
+    def __hydrate_product_dict_from_file(self, src) -> dict:
+        with open(src) as f:
+            return json.load(f)
 
     def __hydrate_category_dict(self):
         cat_set = set()

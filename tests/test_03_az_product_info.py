@@ -15,6 +15,18 @@ def az():
 # Tests
 
 
+def test_localLoad():
+    az = AzProductInfo(None,None,'tests/merged.json')
+    assert len(az.products_list()) > 0
+    assert len(az.categories_list()) > 0
+    assert len(az.services_list()) > 0
+    assert len(az.capabilities_list()) > 0
+    assert len(az.getJoinedData().keys()) > 0
+    assert len(az.getProductDictionary().keys()) > 0
+
+    assert len(az.getCategoryDictionary().keys()) > 0
+
+
 def test_isInitialized(az):
     assert len(az.products_list()) > 0
     assert len(az.categories_list()) > 0
