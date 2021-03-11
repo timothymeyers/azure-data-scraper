@@ -27,7 +27,7 @@ class AzProductInfo:
                 prod['azure-public']['scopes'] = audit_scopes[i]['azure-public']['scopes'].copy()
                 prod['azure-government']['scopes'] = audit_scopes[i]['azure-government']['scopes'].copy()
 
-            prod.pop('doc-type')
+            if 'doc-type' in prod: prod.pop('doc-type')
 
         return product_dict
 
