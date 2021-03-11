@@ -8,13 +8,13 @@ from azure_data_scraper.product_by_region_scraper import ProductsByRegion
 
 @pytest.fixture(scope="session")
 def al ():
-    return ProductsByRegion('web')
+    return ProductsByRegion('web').products()
 
 # Tests
 
 
 def test_isInitialized(al):
-    assert len(al.products().keys()) > 0
+    assert len(al.keys()) > 0
 
 
 @pytest.mark.parametrize("service, cloud, expected_result", [
@@ -30,10 +30,13 @@ def test_isServiceAvailable(al, service, cloud, expected_result):
 @pytest.mark.parametrize("capability, cloud, expected_result", [
     ("H-series", "azure-government", True),
     ("Hb-series", "azure-government", False),
-    ("Hc-series", "azure-government", False)
+    ("Hc-series", "azure-government", True),
+    ("Azure Arc enabled servers","azure-government", True),
 ])
 def test_isCapabilityAvailable(al, capability, cloud, expected_result):
-    assert True
+    assert capability in al
+    cap = al[capability][cloud]
+    assert cap["available"] == expected_result
 
 
 @pytest.mark.parametrize("product, expected_result", [

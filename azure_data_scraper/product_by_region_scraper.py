@@ -10,6 +10,13 @@ import azure_data_scraper.data_mapping as maps
 # Constants
 AZGOV_PRODS_BY_REGION = "https://service.prerender.io/https://azure.microsoft.com/en-us/global-infrastructure/services/?products=all&regions=usgov-non-regional,us-dod-central,us-dod-east,usgov-arizona,usgov-texas,usgov-virginia"
 AZ_US_PRODS_BY_REGION = "https://service.prerender.io/https://azure.microsoft.com/en-us/global-infrastructure/services/?products=all&regions=usgov-non-regional,us-dod-central,us-dod-east,usgov-arizona,usgov-texas,usgov-virginia,non-regional,us-central,us-east,us-east-2,us-north-central,us-south-central,us-west-central,us-west,us-west-2"
+AZ_ARC_BY_REGION = "https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc&regions=usgov-non-regional,us-dod-central,us-dod-east,usgov-arizona,usgov-texas,usgov-virginia,us-central,us-east,us-east-2,us-north-central,us-south-central,us-west-central,us-west,us-west-2"
+
+PRERENDER = "https://service.prerender.io/"
+AZ_PROD_URLS = [
+    "https://azure.microsoft.com/en-us/global-infrastructure/services/?products=all&regions=usgov-non-regional,us-dod-central,us-dod-east,usgov-arizona,usgov-texas,usgov-virginia,non-regional,us-central,us-east,us-east-2,us-north-central,us-south-central,us-west-central,us-west,us-west-2",
+    "https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc&regions=usgov-non-regional,us-dod-central,us-dod-east,usgov-arizona,usgov-texas,usgov-virginia,non-regional,us-central,us-east,us-east-2,us-north-central,us-south-central,us-west-central,us-west,us-west-2"
+]
 
 # Helpers
 
@@ -23,18 +30,22 @@ class ProductsByRegion:
 
         self.__init_products_dictionary()
 
-        soup = self.__init_soup_parser(src)
-        self.__hydrate_products_dictionary(soup)
+        if src == 'web': urls = [ PRERENDER + url for url in AZ_PROD_URLS ]
+        elif src == 'local': urls = [ 'render-all-us.html' ]
+
+        for url in urls:                               
+            soup = self.__init_soup_parser(src, url)
+            self.__hydrate_products_dictionary(soup)
 
         #print(json.dumps(self.__products_dictionary))
 
-    def __init_soup_parser(self, src='web') -> BeautifulSoup:
+    def __init_soup_parser(self, src='web', url='') -> BeautifulSoup:
 
         if src == "web":
-            page = requests.get(AZ_US_PRODS_BY_REGION)
+            page = requests.get(url)
             soup = BeautifulSoup(page.content, features='lxml')
         elif src == "local":
-            with open("render-all-us.html", encoding='utf-8') as f:
+            with open(url, encoding='utf-8') as f:
                 render = html.document_fromstring(f.read())
                 render = html.tostring(render)
             soup = BeautifulSoup(render, features='lxml')
@@ -84,8 +95,7 @@ class ProductsByRegion:
         return soup
 
     def __init_products_dictionary(self):
-        logging.debug(
-            "ProductsByRegion: __init_products_dictionary - starting")
+        logging.debug( "ProductsByRegion: __init_products_dictionary - starting" )
 
         self.__products_dictionary = {i: {} for i in (
             maps.service_list + maps.capability_list)}
@@ -96,8 +106,7 @@ class ProductsByRegion:
         for cap in maps.capability_list:
             self.__products_dictionary[cap] = self.__init_blank_helper(cap, 'capability')
 
-        logging.debug(
-            "ProductsByRegion: __init_products_dictionary - initialized")
+        logging.debug( "ProductsByRegion: __init_products_dictionary - initialized" )
 
     def __init_blank_helper(self, id, type) -> dict:
         return {
@@ -140,8 +149,11 @@ class ProductsByRegion:
         for id, prod in self.__products_dictionary.items():
             if prod['type'] == 'capability' and 'service' in prod:
                 svc = prod['service']
-                self.__products_dictionary[svc]['capabilities'].append(id)
-                prod.pop('capabilities')
+                if svc in self.__products_dictionary:
+                    self.__products_dictionary[svc]['capabilities'].append(id)
+                else:
+                    logging.warn("[%s] does not have associated service" % prod_id)
+                if 'capabilities' in prod: prod.pop('capabilities')
 
     def __hydrate_product_row(self, row, row_class, category="") -> str:
         cols = row.find_all(['th', 'td'])        
@@ -152,23 +164,18 @@ class ProductsByRegion:
         if (row_class.__contains__("category")):
             return prod_id
 
-        ## Ignore if already hydrated
-        if self.__products_dictionary[prod_id]['doc-type'] == "availability":            
-            return prod_id 
+        if prod_id not in self.__products_dictionary:
+            logging.warn("%s is not in product dictionary" % prod_id)
+            self.__products_dictionary[prod_id] = self.__init_blank_helper(prod_id,row_class.replace("-row",""))
+            #print ("WARNING:\n\n",self.__products_dictionary[prod_id],"\n\n")           
 
-        # do i really need this?
-        # if prodId not in self.__products_dictionary:
-        #     logging.error("%s is not in product dictionary" % prodId)
-        #     raise Exception("'%s' is not in product dictionary" % prodId)
-        
-        if self.__products_dictionary[prod_id]['doc-type'] == "availability":
-            ## No need to process this row
-            return prod_id
-        
+        ## Ignore if already hydrated
+        if self.__products_dictionary[prod_id]['doc-type'] == "availability":         
+            return prod_id 
+               
         self.__products_dictionary[prod_id]['doc-type'] = "availability"
 
         for col in cols[1:]:  # skip first col, it is just the prod id
-
             self.__hydrate_region_col(prod_id,col)
 
         if (len( self.__products_dictionary[prod_id]['azure-public']['ga']) > 0):
@@ -179,12 +186,17 @@ class ProductsByRegion:
         self.__products_dictionary[prod_id]['categories'].append(category)
 
         if row_class.__contains__("capability"):
-            self.__products_dictionary[prod_id]['service'] = maps.capability_service_map[prod_id]
-            
+            if prod_id in maps.capability_service_map:
+                self.__products_dictionary[prod_id]['service'] = maps.capability_service_map[prod_id]
+            else:
+                logging.warn("[%s] is not in capability_service_map" % prod_id)
+                self.__products_dictionary[prod_id]['service'] = ""
+
+        #print ("\n\n%s\n\n" % self.__products_dictionary[prod_id])
 
         return prod_id
 
-    def __hydrate_region_col(self, prodId, col):
+    def __hydrate_region_col(self, prodId, col):        
         col_text = col.text.strip()
         region = col['data-region-slug']
 
