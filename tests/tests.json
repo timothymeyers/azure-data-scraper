@@ -1,0 +1,166 @@
+{
+  "Full Service": {
+    "prod-id": "Full Service",
+    "type": "service",
+    "capabilities": [],
+    "categories": [
+      "category1",
+      "category2"
+    ],
+    "azure-public": {
+      "available": true,
+      "scopes": [
+        "gcc-scope-1",
+        "gcc-scope-2",
+        "gcc-scope-3"
+      ],
+      "ga": [
+        "gcc-ga-reg-1",
+        "gcc-ga-reg-2"
+      ],
+      "preview": [
+        "gcc-prev-reg-1"
+      ],
+      "planned-active": [
+        {
+          "region": "gcc-prev-reg-1",
+          "ga-expected": "Q2 2021"
+        },
+        {
+          "region": "gcc-prev-reg-2",
+          "ga-expected": "Q2 2021"
+        },
+        {
+          "region": "gcc-prev-reg-3",
+          "ga-expected": "Q3 2021"
+        },
+        {
+          "region": "gcc-prev-reg-4",
+          "ga-expected": "Q4 2021"
+        }
+      ]
+    },
+    "azure-government": {
+      "available": true,
+      "scopes": [
+        "mag-scope-1",
+        "mag-scope-2"
+      ],
+      "ga": [
+        "mag-ga-reg-1",
+        "mag-ga-reg-2"
+      ],
+      "preview": [
+        "mag-prev-reg-1",
+        "mag-prev-reg-2"
+      ],
+      "planned-active": [
+        {
+          "region": "mag-prev-reg-1",
+          "ga-expected": "Q2 2021"
+        },
+        {
+          "region": "mag-prev-reg-2",
+          "ga-expected": "Q2 2021"
+        },
+        {
+          "region": "mag-prev-reg-3",
+          "ga-expected": "Q3 2021"
+        },
+        {
+          "region": "mag-prev-reg-4",
+          "ga-expected": "Q4 2021"
+        }
+      ]
+    }
+  },
+  "Empty Service": {
+    "prod-id": "Empty Service",
+    "type": "service",
+    "capabilities": [],
+    "categories": [],
+    "azure-public": {
+      "available": false,
+      "scopes": [],
+      "ga": [],
+      "preview": [],
+      "planned-active": []
+    },
+    "azure-government": {
+      "available": false,
+      "scopes": [],
+      "ga": [],
+      "preview": [],
+      "planned-active": []
+    }
+  },
+  "Not GA Service": {
+    "prod-id": "Not GA Service",
+    "type": "service",
+    "capabilities": [],
+    "categories": [
+      "category1",
+      "category2"
+    ],
+    "azure-public": {
+      "available": false,
+      "scopes": [
+        "gcc-scope-1",
+        "gcc-scope-2",
+        "gcc-scope-3"
+      ],
+      "ga": [],
+      "preview": [
+        "gcc-prev-reg-1"
+      ],
+      "planned-active": [
+        {
+          "region": "gcc-prev-reg-1",
+          "ga-expected": "Q2 2021"
+        },
+        {
+          "region": "gcc-prev-reg-2",
+          "ga-expected": "Q2 2021"
+        },
+        {
+          "region": "gcc-prev-reg-3",
+          "ga-expected": "Q3 2021"
+        },
+        {
+          "region": "gcc-prev-reg-4",
+          "ga-expected": "Q4 2021"
+        }
+      ]
+    },
+    "azure-government": {
+      "available": false,
+      "scopes": [
+        "mag-scope-1",
+        "mag-scope-2"
+      ],
+      "ga": [],
+      "preview": [
+        "mag-prev-reg-1",
+        "mag-prev-reg-2"
+      ],
+      "planned-active": [
+        {
+          "region": "mag-prev-reg-1",
+          "ga-expected": "Q2 2021"
+        },
+        {
+          "region": "mag-prev-reg-2",
+          "ga-expected": "Q2 2021"
+        },
+        {
+          "region": "mag-prev-reg-3",
+          "ga-expected": "Q3 2021"
+        },
+        {
+          "region": "mag-prev-reg-4",
+          "ga-expected": "Q4 2021"
+        }
+      ]
+    }
+  }
+}
