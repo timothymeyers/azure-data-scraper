@@ -22,6 +22,7 @@ AZ_PROD_URLS = [
 
 # Gets text from an HTML element
 
+
 class ProductsByRegion:
     def __init__(self, src='web'):
         self.__products_dictionary = {}
@@ -30,14 +31,16 @@ class ProductsByRegion:
 
         self.__init_products_dictionary()
 
-        if src == 'web': urls = [ PRERENDER + url for url in AZ_PROD_URLS ]
-        elif src == 'local': urls = [ 'render-all-us.html' ]
+        if src == 'web':
+            urls = [PRERENDER + url for url in AZ_PROD_URLS]
+        elif src == 'local':
+            urls = ['render-all-us.html']
 
-        for url in urls:                               
+        for url in urls:
             soup = self.__init_soup_parser(src, url)
             self.__hydrate_products_dictionary(soup)
 
-        #print(json.dumps(self.__products_dictionary))
+        # print(json.dumps(self.__products_dictionary))
 
     def __init_soup_parser(self, src='web', url='') -> BeautifulSoup:
 
@@ -95,18 +98,22 @@ class ProductsByRegion:
         return soup
 
     def __init_products_dictionary(self):
-        logging.debug( "ProductsByRegion: __init_products_dictionary - starting" )
+        logging.debug(
+            "ProductsByRegion: __init_products_dictionary - starting")
 
         self.__products_dictionary = {i: {} for i in (
             maps.service_list + maps.capability_list)}
 
         for svc in maps.service_list:
-            self.__products_dictionary[svc] = self.__init_blank_helper(svc, 'service')
+            self.__products_dictionary[svc] = self.__init_blank_helper(
+                svc, 'service')
 
         for cap in maps.capability_list:
-            self.__products_dictionary[cap] = self.__init_blank_helper(cap, 'capability')
+            self.__products_dictionary[cap] = self.__init_blank_helper(
+                cap, 'capability')
 
-        logging.debug( "ProductsByRegion: __init_products_dictionary - initialized" )
+        logging.debug(
+            "ProductsByRegion: __init_products_dictionary - initialized")
 
     def __init_blank_helper(self, id, type) -> dict:
         return {
@@ -128,14 +135,14 @@ class ProductsByRegion:
                 "preview": [],
                 "planned-active": []
             },
-            'doc-type':''
+            'doc-type': ''
         }
 
     def __hydrate_products_dictionary(self, soup):
         rows = soup.find_all('tr')
 
         lastCat = ""
-        for row in rows[2:]:                      
+        for row in rows[2:]:
             row_class = row['class'][0]
 
             # Category
@@ -144,43 +151,45 @@ class ProductsByRegion:
                 lastCat = maps.clean_product_name(prod_id, row_class)
             else:
                 prod_id = self.__hydrate_product_row(row, row_class, lastCat)
-        
-        #update service field for capabilities
+
+        # update service field for capabilities
         for id, prod in self.__products_dictionary.items():
             if prod['type'] == 'capability' and 'service' in prod:
                 svc = prod['service']
                 if svc in self.__products_dictionary:
                     self.__products_dictionary[svc]['capabilities'].append(id)
                 else:
-                    logging.warn("[%s] does not have associated service" % prod_id)
-                if 'capabilities' in prod: prod.pop('capabilities')
+                    logging.warning(
+                        "[%s] does not have associated service" % prod_id)
+                if 'capabilities' in prod:
+                    prod.pop('capabilities')
 
     def __hydrate_product_row(self, row, row_class, category="") -> str:
-        cols = row.find_all(['th', 'td'])        
+        cols = row.find_all(['th', 'td'])
 
         prod_id = maps.clean_product_name(cols[0].text, row_class)
 
-        ## Ignore category rows
+        # Ignore category rows
         if (row_class.__contains__("category")):
             return prod_id
 
         if prod_id not in self.__products_dictionary:
-            logging.warn("%s is not in product dictionary" % prod_id)
-            self.__products_dictionary[prod_id] = self.__init_blank_helper(prod_id,row_class.replace("-row",""))
-            #print ("WARNING:\n\n",self.__products_dictionary[prod_id],"\n\n")           
+            logging.warning("%s is not in product dictionary" % prod_id)
+            self.__products_dictionary[prod_id] = self.__init_blank_helper(
+                prod_id, row_class.replace("-row", ""))
 
-        ## Ignore if already hydrated
-        if self.__products_dictionary[prod_id]['doc-type'] == "availability":         
-            return prod_id 
-               
+        # Ignore if already hydrated
+        if self.__products_dictionary[prod_id]['doc-type'] == "availability":
+            return prod_id
+
         self.__products_dictionary[prod_id]['doc-type'] = "availability"
 
         for col in cols[1:]:  # skip first col, it is just the prod id
-            self.__hydrate_region_col(prod_id,col)
+            self.__hydrate_region_col(prod_id, col)
 
-        if (len( self.__products_dictionary[prod_id]['azure-public']['ga']) > 0):
+        if (len(self.__products_dictionary[prod_id]['azure-public']['ga']) > 0):
             self.__products_dictionary[prod_id]['azure-public']['available'] = True
-        if (len( self.__products_dictionary[prod_id]['azure-government']['ga']) > 0):
+        if (len(self.__products_dictionary[prod_id]['azure-government']['ga']) > 0):
             self.__products_dictionary[prod_id]['azure-government']['available'] = True
 
         self.__products_dictionary[prod_id]['categories'].append(category)
@@ -189,14 +198,13 @@ class ProductsByRegion:
             if prod_id in maps.capability_service_map:
                 self.__products_dictionary[prod_id]['service'] = maps.capability_service_map[prod_id]
             else:
-                logging.warn("[%s] is not in capability_service_map" % prod_id)
+                logging.warning(
+                    "[%s] is not in capability_service_map" % prod_id)
                 self.__products_dictionary[prod_id]['service'] = ""
-
-        #print ("\n\n%s\n\n" % self.__products_dictionary[prod_id])
 
         return prod_id
 
-    def __hydrate_region_col(self, prodId, col):        
+    def __hydrate_region_col(self, prodId, col):
         col_text = col.text.strip()
         region = col['data-region-slug']
 
@@ -227,10 +235,11 @@ class ProductsByRegion:
                 'ga-expected': ga_expected
             }
 
-            self.__products_dictionary[prodId][cloud]['planned-active'].append(active)
+            self.__products_dictionary[prodId][cloud]['planned-active'].append(
+                active)
 
     def products(self) -> dict:
         return self.__products_dictionary.copy()
-    
+
     def getProductsAvailabilityDictionary(self) -> dict:
         return self.__products_dictionary.copy()
