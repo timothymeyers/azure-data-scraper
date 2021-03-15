@@ -4,7 +4,8 @@
 
 [![03 Publish to PyPi](https://github.com/timothymeyers/azure-data-scraper/actions/workflows/publish-to-pypi.yml/badge.svg)](https://github.com/timothymeyers/azure-data-scraper/actions/workflows/publish-to-pypi.yml)
 
+[![codecov](https://codecov.io/gh/timothymeyers/azure-data-scraper/branch/main/graph/badge.svg?token=F0PCFFPNDT)](https://codecov.io/gh/timothymeyers/azure-data-scraper)
+
 # azure-data-scraper
 tbd
 
-[Code Coverage](https://code-coverage-app.azurewebsites.net/)
