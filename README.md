@@ -6,6 +6,8 @@
 
 [![codecov](https://codecov.io/gh/timothymeyers/azure-data-scraper/branch/main/graph/badge.svg?token=F0PCFFPNDT)](https://codecov.io/gh/timothymeyers/azure-data-scraper)
 
+[![PyPI version](https://badge.fury.io/py/azure-data-scraper.svg)](https://badge.fury.io/py/azure-data-scraper)
+
 # azure-data-scraper
 tbd
 
