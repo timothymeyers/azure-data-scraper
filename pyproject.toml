@@ -2,7 +2,7 @@
 name = "azure_data_scraper"
 version = "0.1.7"
 description = ""
-authors = ["Tim Meyers <timothy.m.meyers@gmail.com>"]
+authors = ["Tim Meyers <timothy.m.meyers@gmail.com>", "Tim Meyers <timothy.meyers@microsoft.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
