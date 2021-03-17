@@ -159,6 +159,12 @@ class AzProductInfo:
 
         return (az_pub or az_gov)
 
+    def isProductNonRegional(self, prod) -> bool:
+        az_pub = self.isProductAvailableInRegion (prod, 'non-regional')
+        az_gov = self.isProductAvailableInRegion (prod, 'usgov-non-regional')
+
+        return (az_pub or az_gov)
+
     def isAtAuditScope(self,prod, scope, cloud="") -> bool:
         az_pub = scope in self.getProductScopes(prod,'azure-public')
         az_gov = scope in self.getProductScopes(prod,'azure-government')
