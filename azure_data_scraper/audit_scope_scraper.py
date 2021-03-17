@@ -41,7 +41,7 @@ class AuditScopes:
         logging.info("AuditScopes - Initialization Complete")
 
     def __init_html_tables(self):
-        logging.debug("AuditScopes - Retrieving URL", AZ_AUDIT_SCOPE_URL)
+        logging.debug("AuditScopes - Retrieving URL" + AZ_AUDIT_SCOPE_URL)
 
         page = requests.get(AZ_AUDIT_SCOPE_URL)
         tree = html.fromstring(page.content)
