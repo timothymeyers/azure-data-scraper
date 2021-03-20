@@ -57,10 +57,8 @@ class ProductsByRegion:
 
         soup = soup.find(attrs={"class": "primary-table"})
 
-        soup = self.__helper_replace_soup_image(
-            soup, "preview-active.svg", "preview-active")
-        soup = self.__helper_replace_soup_image(
-            soup, "planned-active.svg", "planned-active")
+        soup = self.__helper_replace_soup_image(soup, "preview-active.svg", "preview-active")
+        soup = self.__helper_replace_soup_image(soup, "planned-active.svg", "planned-active")
         soup = self.__helper_replace_soup_image(soup, "preview.svg", "preview")
         soup = self.__helper_replace_soup_image(soup, "ga.svg", "check")
         soup = self.__helper_remove_tooltip_content_from_soup(soup)
@@ -68,9 +66,7 @@ class ProductsByRegion:
         return soup
 
     def __helper_replace_soup_image(self, soup, img_file_name, text):
-        imgs = soup.find_all(name="img", attrs={
-            "src": re.compile(img_file_name)
-        }, recursive=True)
+        imgs = soup.find_all(name="img", attrs={"src": re.compile(img_file_name)}, recursive=True)
 
         for img in imgs:
             img.name = "p"
@@ -78,48 +74,40 @@ class ProductsByRegion:
             del img['role']
             del img['alt']
             if (text.__contains__("-active")):
-                img['ga-expected'] = img.parent.get_text(
-                    " ", strip=True).replace("GA expected ", "")
+                img['ga-expected'] = img.parent.get_text(" ",
+                                                         strip=True).replace("GA expected ", "")
 
             img.string = text
 
         return soup
 
     def __helper_remove_tooltip_content_from_soup(self, soup):
-        table_tooltips = soup.find_all(
-            "span", attrs={"class": "table-tooltip"})
-        tooltip_content = soup.find_all(
-            "span", attrs={"class": "tooltip-content"})
+        table_tooltips = soup.find_all("span", attrs={"class": "table-tooltip"})
+        tooltip_content = soup.find_all("span", attrs={"class": "tooltip-content"})
         hide_text = soup.find_all("span", attrs={"class": "tooltip-content"})
 
-        for tiptag in (table_tooltips + tooltip_content+hide_text):
-            tiptag.decompose()
+        {tiptag.decompose() for tiptag in (table_tooltips + tooltip_content + hide_text)}
 
         return soup
 
     def __init_products_dictionary(self):
-        logging.debug(
-            "ProductsByRegion: __init_products_dictionary - starting")
+        logging.debug("ProductsByRegion: __init_products_dictionary - starting")
 
-        self.__products_dictionary = {i: {} for i in (
-            maps.service_list + maps.capability_list)}
+        self.__products_dictionary = {i: {} for i in (maps.service_list + maps.capability_list)}
 
         for svc in maps.service_list:
-            self.__products_dictionary[svc] = self.__init_blank_helper(
-                svc, 'service')
+            self.__products_dictionary[svc] = self.__init_blank_helper(svc, 'service')
 
         for cap in maps.capability_list:
-            self.__products_dictionary[cap] = self.__init_blank_helper(
-                cap, 'capability')
+            self.__products_dictionary[cap] = self.__init_blank_helper(cap, 'capability')
 
-        logging.debug(
-            "ProductsByRegion: __init_products_dictionary - initialized")
+        logging.debug("ProductsByRegion: __init_products_dictionary - initialized")
 
     def __init_blank_helper(self, id, type) -> dict:
         return {
             'prod-id': id,
             'type': type,
-            'capabilities': [],
+            'capabilities': set(),
             'categories': [],
             'azure-public': {
                 "available": False,
@@ -157,10 +145,9 @@ class ProductsByRegion:
             if prod['type'] == 'capability' and 'service' in prod:
                 svc = prod['service']
                 if svc in self.__products_dictionary:
-                    self.__products_dictionary[svc]['capabilities'].append(id)
+                    self.__products_dictionary[svc]['capabilities'].add(id)
                 else:
-                    logging.warning(
-                        "[%s] does not have associated service" % prod_id)
+                    logging.warning(f"[{prod_id}] does not have associated service")
                 if 'capabilities' in prod:
                     prod.pop('capabilities')
 
@@ -174,9 +161,10 @@ class ProductsByRegion:
             return prod_id
 
         if prod_id not in self.__products_dictionary:
-            logging.warning("%s is not in product dictionary" % prod_id)
+            logging.warning(f"{prod_id} is not in product dictionary")
             self.__products_dictionary[prod_id] = self.__init_blank_helper(
-                prod_id, row_class.replace("-row", ""))
+                prod_id, row_class.replace("-row", "")
+            )
 
         # Ignore if already hydrated
         if self.__products_dictionary[prod_id]['doc-type'] == "availability":
@@ -184,7 +172,7 @@ class ProductsByRegion:
 
         self.__products_dictionary[prod_id]['doc-type'] = "availability"
 
-        for col in cols[1:]:  # skip first col, it is just the prod id
+        for col in cols[1:]:               # skip first col, it is just the prod id
             self.__hydrate_region_col(prod_id, col)
 
         if (len(self.__products_dictionary[prod_id]['azure-public']['ga']) > 0):
@@ -196,10 +184,10 @@ class ProductsByRegion:
 
         if row_class.__contains__("capability"):
             if prod_id in maps.capability_service_map:
-                self.__products_dictionary[prod_id]['service'] = maps.capability_service_map[prod_id]
+                self.__products_dictionary[prod_id]['service'] = maps.capability_service_map[prod_id
+                                                                                             ]
             else:
-                logging.warning(
-                    "[%s] is not in capability_service_map" % prod_id)
+                logging.warning(f"[{prod_id}] is not in capability_service_map")
                 self.__products_dictionary[prod_id]['service'] = ""
 
         return prod_id
@@ -213,8 +201,8 @@ class ProductsByRegion:
         elif region in maps.usgov_regions:
             cloud = 'azure-government'
         else:
-            logging.error("Unknown region [%s]" % region)
-            raise Exception("Unknown region [%s]" % region)
+            logging.error(f"Unknown region [{region}]")
+            raise Exception(f"Unknown region [{region}]")
 
         ## row is GA in region
         if col_text == "check":
@@ -222,21 +210,16 @@ class ProductsByRegion:
 
         ## row is Preview in region
         if "preview" in col_text:
-            self.__products_dictionary[prodId][cloud]['preview'].append(
-                region)
+            self.__products_dictionary[prodId][cloud]['preview'].append(region)
 
         # row has target active date
         if col_text.__contains__("-active"):
             p = col.find('p')
             ga_expected = p['ga-expected']
 
-            active = {
-                'region': region,
-                'ga-expected': ga_expected
-            }
+            active = {'region': region, 'ga-expected': ga_expected}
 
-            self.__products_dictionary[prodId][cloud]['planned-active'].append(
-                active)
+            self.__products_dictionary[prodId][cloud]['planned-active'].append(active)
 
     def products(self) -> dict:
         return self.__products_dictionary.copy()
