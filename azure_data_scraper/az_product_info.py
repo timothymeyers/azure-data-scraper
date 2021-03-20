@@ -27,6 +27,11 @@ class AzProductInfo:
                 prod['azure-public']['scopes'] = audit_scopes[i]['azure-public']['scopes'].copy()
                 prod['azure-government']['scopes'] = audit_scopes[i]['azure-government']['scopes'].copy()
 
+            ## need to fix issue where Audit Scope capabilities are not mapped to PbR services
+            if i in audit_scopes and prod['type'] == 'capability':
+                svc = maps.capability_service_map[i]
+                product_dict[svc]['capabilities'].add(i)
+
             if 'doc-type' in prod: prod.pop('doc-type')
 
         return product_dict
