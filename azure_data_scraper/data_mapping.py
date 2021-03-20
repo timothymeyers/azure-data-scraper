@@ -1,6 +1,4 @@
-
-
-def clean_product_name(name, prod_type = ""):
+def clean_product_name(name, prod_type=""):
 
     name = name.strip().replace(u'\u2013', u'-')
 
@@ -12,8 +10,9 @@ def clean_product_name(name, prod_type = ""):
         return service_map[name]
     elif (name in capability_map):
         return capability_map[name]
-    
+
     return name
+
 
 # Brute Force data mapping
 
@@ -38,7 +37,7 @@ service_map = {
     'Time Series Insights': 'Azure Time Series Insights',
     'Azure Intune': 'Intune',
     'Azure Machine Learning studio': 'Machine Learning Studio',
-    'Load Balancing':'Load Balancer',
+    'Load Balancing': 'Load Balancer',
     'Virtual Machines (incl. Reserved Instances)': 'Virtual Machines',
     'Azure DB for MySQL': 'Azure Database for MySQL',
     'Azure DB for PostgreSQL': 'Azure Database for PostgreSQL',
@@ -419,8 +418,8 @@ capability_service_map = {
     'Dynamics 365 Service Omni-Channel Engagement Hub': 'Dynamics 365',
     'Dynamics 365 Supply Chain': 'Dynamics 365',
     'Export to Data Lake service': 'Microsoft PowerApps',
-    'Archive Storage':	'Storage Accounts',
-    'AI Builder':	'Power Platform',
+    'Archive Storage': 'Storage Accounts',
+    'AI Builder': 'Power Platform',
     'Flow': 'Power Automate',
     'Guest Configuration': 'Azure Policy',
     'Log Analytics': 'Azure Monitor',
@@ -443,7 +442,7 @@ capability_service_map = {
     'Alerts (Classic)': 'Azure Monitor',
     'Anomaly Detector': 'Azure Cognitive Services',
     'Application Insights': 'Azure Monitor',
-    'Application Change Analysis':	'Azure Monitor',
+    'Application Change Analysis': 'Azure Monitor',
     'AutoScale': 'Azure Monitor',
     'Av2': 'Cloud Services',
     'Azure Active Directory External Identities': 'Azure Active Directory',
@@ -496,7 +495,7 @@ capability_service_map = {
     'Import/Export': 'Storage Accounts',
     'Instance Level IPs': 'Cloud Services',
     'IoT Hub Device Provisioning Service': 'Azure IoT Hub',
-    'Device Update for IoT Hub':'Azure IoT Hub',
+    'Device Update for IoT Hub': 'Azure IoT Hub',
     'Live Video Analytics': 'Media Services',
     'Ls-series': 'Virtual Machines',
     'Lsv2-series': 'Cloud Services',
@@ -573,8 +572,7 @@ capability_service_map = {
     'Storage: Tables': 'Storage Accounts',
     'Virtual Network NAT': 'Virtual Network',
     'Web Application Firewall': 'Application Gateway',
-    'Web Apps': 'App Service'
-
+    'Web Apps': 'App Service',
 }
 
 us_regions = [
@@ -598,18 +596,9 @@ usgov_regions = [
     "usgov-non-regional"
 ]
 
-usdod_regions = [
-    "us-dod-central",
-    "us-dod-east",
-    "usgov-non-regional"
-]
+usdod_regions = ["us-dod-central", "us-dod-east", "usgov-non-regional"]
 
-us_scopes = [
-    "dodCcSrgIl2",
-    "fedrampModerate",
-    "fedrampHigh",
-    "planned2021"
-]
+us_scopes = ["dodCcSrgIl2", "fedrampModerate", "fedrampHigh", "planned2021"]
 
 usgov_scopes = [
     "dodCcSrgIl2",
@@ -629,5 +618,4 @@ scope_map = {
     'dodCcSrgIl5AzureGov': 'IL5 in Gov Regions',
     'dodCcSrgIl5AzureDod': 'IL5 in DoD Regions',
     'dodCcSrgIl6': 'IL6'
-
 }
