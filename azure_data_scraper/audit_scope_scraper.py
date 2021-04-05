@@ -85,6 +85,10 @@ class AuditScopes:
 
         az_dict = self.__dict_from_html_table(html_table)
 
+        for id in az_dict.keys():
+            if id not in self.__audit_scope_dictionary: 
+                self.__audit_scope_dictionary[id] = self.__init_blank_helper(id,'unknown')
+
         for id, svc in az_dict.items():
             for scope, value in svc.items():
                 if value == "Check":
