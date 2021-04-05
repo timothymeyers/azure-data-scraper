@@ -76,7 +76,8 @@ class AuditScopes:
             'type': type,
             'azure-public': {'scopes': []},
             'azure-government': {'scopes': []},
-            'doc-type': 'audit-scope'
+            'doc-type': 'audit-scope',
+            'scope-data': False
         }           
 
     def __hydrate_audit_scope_dictionary(self, html_table, cloud):
@@ -98,6 +99,7 @@ class AuditScopes:
                         tmp = camelize(scope)            
                         self.__audit_scope_dictionary[svc][cloud]['scopes'].append(tmp)
                     """
+            self.__audit_scope_dictionary[id]['scope-data'] = True
         
         logging.debug("AuditScopes - Audit Scope Dictionary - Hydration Complete")
 

@@ -123,7 +123,8 @@ class ProductsByRegion:
                 "preview": [],
                 "planned-active": []
             },
-            'doc-type': ''
+            'doc-type': '',
+            'availability-data': False
         }
 
     def __hydrate_products_dictionary(self, soup):
@@ -171,6 +172,7 @@ class ProductsByRegion:
             return prod_id
 
         self.__products_dictionary[prod_id]['doc-type'] = "availability"
+        self.__products_dictionary[prod_id]['availability-data'] = True
 
         for col in cols[1:]:               # skip first col, it is just the prod id
             self.__hydrate_region_col(prod_id, col)
