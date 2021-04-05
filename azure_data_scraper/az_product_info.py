@@ -7,12 +7,17 @@ import logging
 
 
 class AzProductInfo:
-    def __init__(self, audit_scopes=AuditScopes(), products_by_region=ProductsByRegion(), src="web"):
+    def __init__(
+        self, audit_scopes=AuditScopes(), products_by_region=ProductsByRegion(), src="web"
+    ):
         #self.__audit_scopes = audit_scopes
         #self.__products_by_region = products_by_region
 
         if src == "web":
-            self.__product_dict = self.__hydrate_product_dict(audit_scopes.getAuditScopeDictionary(), products_by_region.getProductsAvailabilityDictionary())
+            self.__product_dict = self.__hydrate_product_dict(
+                audit_scopes.getAuditScopeDictionary(),
+                products_by_region.getProductsAvailabilityDictionary()
+            )
         else:
             self.__product_dict = self.__hydrate_product_dict_from_file(src)
         self.__category_dict = self.__hydrate_category_dict()
@@ -24,15 +29,18 @@ class AzProductInfo:
         for i, prod in product_dict.items():
 
             if i in audit_scopes:
+                prod['scope-data'] = audit_scopes[i]['scope-data']
                 prod['azure-public']['scopes'] = audit_scopes[i]['azure-public']['scopes'].copy()
-                prod['azure-government']['scopes'] = audit_scopes[i]['azure-government']['scopes'].copy()
+                prod['azure-government']['scopes'] = audit_scopes[i]['azure-government']['scopes'
+                                                                                         ].copy()
 
             ## need to fix issue where Audit Scope capabilities are not mapped to PbR services
             if i in audit_scopes and prod['type'] == 'capability':
                 svc = maps.capability_service_map[i]
                 product_dict[svc]['capabilities'].add(i)
 
-            if 'doc-type' in prod: prod.pop('doc-type')
+            if 'doc-type' in prod:
+                prod.pop('doc-type')
 
         return product_dict
 
@@ -52,8 +60,7 @@ class AzProductInfo:
         categories = {cat: [] for cat in cat_set}
 
         for id, prod in self.__product_dict.items():
-            {categories[cat].append(
-                id) for cat in prod['categories'] if prod['type'] == "service"}
+            {categories[cat].append(id) for cat in prod['categories'] if prod['type'] == "service"}
 
         #print ("categories", categories)
 
@@ -78,7 +85,6 @@ class AzProductInfo:
     def categories(self) -> dict:
         return self.__category_dict.copy()
 
-
     def getCategoryDictionary(self) -> dict:
         return self.__category_dict.copy()
 
@@ -97,13 +103,12 @@ class AzProductInfo:
             return self.getProductDetails(prod_id)
         return {}
 
-    def getServiceDetailsDeep(self, prod_id) -> dict:        
+    def getServiceDetailsDeep(self, prod_id) -> dict:
         svc = self.getServiceDetails(prod_id)
-        if 'capabilities' in svc:           
+        if 'capabilities' in svc:
             new_cap_dict = {cap: self.getProductDetails(cap) for cap in svc['capabilities']}
             svc['capabilities'] = new_cap_dict
         return svc
-
         """
         if prod_id in self.__product_dict and self.__product_dict[prod_id]['type'] == "service":
             return_prod = self.__product_dict[prod_id].copy()
@@ -143,14 +148,23 @@ class AzProductInfo:
     def capabilities_list(self) -> list:
         return [id for id, prod in self.__product_dict.items() if prod['type'] == 'capability']
 
-
     #### Question and Answer
+    def hasAvailabilityData(self, prod) -> bool:
+        if prod in self.__product_dict:
+            return prod['availability-data']
+        return False
+
+    def hasScopeData(self, prod) -> bool:
+        if prod in self.__product_dict:
+            return prod['scope-data']
+        return False
+
     def isProductAvailable(self, prod, cloud="") -> bool:
 
         if prod in self.__product_dict:
             az_pub = self.__product_dict[prod]['azure-public']['available']
             az_gov = self.__product_dict[prod]['azure-government']['available']
-        
+
             if (cloud == 'azure-public'): return az_pub
             if (cloud == 'azure-government'): return az_gov
 
@@ -159,20 +173,20 @@ class AzProductInfo:
         return False
 
     def isProductAvailableInRegion(self, prod, region) -> bool:
-        az_pub = region in self.getProductAvailableRegions(prod,'azure-public')
-        az_gov = region in self.getProductAvailableRegions(prod,'azure-government')
+        az_pub = region in self.getProductAvailableRegions(prod, 'azure-public')
+        az_gov = region in self.getProductAvailableRegions(prod, 'azure-government')
 
         return (az_pub or az_gov)
 
     def isProductNonRegional(self, prod) -> bool:
-        az_pub = self.isProductAvailableInRegion (prod, 'non-regional')
-        az_gov = self.isProductAvailableInRegion (prod, 'usgov-non-regional')
+        az_pub = self.isProductAvailableInRegion(prod, 'non-regional')
+        az_gov = self.isProductAvailableInRegion(prod, 'usgov-non-regional')
 
         return (az_pub or az_gov)
 
-    def isAtAuditScope(self,prod, scope, cloud="") -> bool:
-        az_pub = scope in self.getProductScopes(prod,'azure-public')
-        az_gov = scope in self.getProductScopes(prod,'azure-government')
+    def isAtAuditScope(self, prod, scope, cloud="") -> bool:
+        az_pub = scope in self.getProductScopes(prod, 'azure-public')
+        az_gov = scope in self.getProductScopes(prod, 'azure-government')
 
         if (cloud == 'azure-public'): return az_pub
         if (cloud == 'azure-government'): return az_gov
@@ -180,16 +194,16 @@ class AzProductInfo:
         return (az_pub or az_gov)
 
     def isServiceAvailable(self, svc, cloud="") -> bool:
-        return self.isProductAvailable(svc,cloud)
+        return self.isProductAvailable(svc, cloud)
 
     def isServiceAvailableInRegion(self, svc, region) -> bool:
-        return self.isProductAvailableInRegion(svc,region)
+        return self.isProductAvailableInRegion(svc, region)
 
     def isCapabilityAvailable(self, cap, cloud="") -> bool:
-        return self.isProductAvailable(cap,cloud)
-    
+        return self.isProductAvailable(cap, cloud)
+
     def isCapabilityAvailableInRegion(self, cap, region) -> bool:
-        return self.isProductAvailableInRegion(cap,region)
+        return self.isProductAvailableInRegion(cap, region)
 
     def getProductAvailableRegions(self, prod, cloud="") -> list:
         return self.__helper_get_product_cloud_lists(prod, cloud, 'ga')
