@@ -151,12 +151,12 @@ class AzProductInfo:
     #### Question and Answer
     def hasAvailabilityData(self, prod) -> bool:
         if prod in self.__product_dict:
-            return prod['availability-data']
+            return self.__product_dict[prod]['availability-data']
         return False
 
     def hasScopeData(self, prod) -> bool:
         if prod in self.__product_dict:
-            return prod['scope-data']
+            return self.__product_dict[prod]['scope-data']
         return False
 
     def isProductAvailable(self, prod, cloud="") -> bool:
