@@ -16,6 +16,15 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.8'
+    - name: DevSkim
+      uses: microsoft/DevSkim-Action@v1
+      #with:
+      # The sub directory of the repository root to scan. Repository root used by default.
+      #directory-to-scan: # optional, default is GITHUB_WORKSPACE
+      # Optionally scan the contents of archives.
+      #should-scan-archives: # optional
+      # The filename for the output.
+      #output-filename: # optional, default is devskim-results.sarif
     - name: Install Poetry
       uses: snok/install-poetry@v1.1.1
     - name: Export requirements.txt using Poetry
