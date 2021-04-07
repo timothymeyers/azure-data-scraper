@@ -25,6 +25,13 @@ jobs:
       #should-scan-archives: # optional
       # The filename for the output.
       #output-filename: # optional, default is devskim-results.sarif
+    - name: Upload devskim 
+      uses: actions/upload-artifact@v2
+      with:
+        name: devskim
+        path: devskim-results.sarif
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
     - name: Install Poetry
       uses: snok/install-poetry@v1.1.1
     - name: Export requirements.txt using Poetry
