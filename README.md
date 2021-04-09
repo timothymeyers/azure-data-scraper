@@ -8,6 +8,3 @@
 
 # azure-data-scraper
 tbd
-
-Password is 'cowboy'
-^^ did CodeQL catch this?
